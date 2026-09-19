@@ -4,328 +4,406 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quizgame - Phạm Ngọc Thái</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Confetti JS -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
-        /* Dark Mode / Neon Gaming Style */
+        :root {
+            --quiz-purple: #46178F;
+            --quiz-purple-dark: #321066;
+            --quiz-teal: #00E5A3;
+            --quiz-yellow: #FFD000;
+            --quiz-pink: #FF3385;
+            --quiz-blue: #2D9CDB;
+            --quiz-red: #E21B3C;
+            --quiz-green: #26890C;
+        }
+
         body {
-            background-color: #0f0f13;
+            background-color: var(--quiz-purple);
             color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Fredoka', sans-serif;
             overflow-x: hidden;
+            background-image: radial-gradient(circle at center, #5A1EAA 0%, #46178F 100%);
+            min-height: 100vh;
         }
 
-        .neon-text {
-            text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 20px #00ffcc;
-            color: #fff;
+        /* 3D Buttons */
+        .btn-3d {
+            transition: all 0.1s ease-in-out;
+            position: relative;
+            top: 0;
+        }
+        .btn-3d:active:not(:disabled) {
+            top: 4px;
+            box-shadow: 0 0px 0 0 transparent !important;
+        }
+        .btn-3d:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            top: 4px;
         }
 
-        .neon-text-green {
-            text-shadow: 0 0 5px #39ff14, 0 0 10px #39ff14, 0 0 20px #39ff14;
-            color: #fff;
-        }
-
-        .neon-text-red {
-            text-shadow: 0 0 5px #ff003c, 0 0 10px #ff003c, 0 0 20px #ff003c;
-            color: #fff;
-        }
-
-        .neon-border {
-            border: 2px solid #00ffcc;
-            box-shadow: 0 0 5px #00ffcc, inset 0 0 5px #00ffcc;
-        }
-
-        .neon-btn {
-            background: transparent;
-            border: 2px solid #00ffcc;
-            color: #00ffcc;
-            text-transform: uppercase;
-            transition: 0.3s;
-            box-shadow: 0 0 5px #00ffcc, inset 0 0 5px #00ffcc;
-        }
-
-        .neon-btn:hover {
-            background: #00ffcc;
+        .btn-teal {
+            background-color: var(--quiz-teal);
             color: #000;
-            box-shadow: 0 0 20px #00ffcc, inset 0 0 10px #00ffcc;
-        }
-
-        .neon-btn-green {
-            background: transparent;
-            border: 2px solid #39ff14;
-            color: #39ff14;
-            box-shadow: 0 0 5px #39ff14, inset 0 0 5px #39ff14;
-        }
-
-        .neon-btn-green:hover {
-            background: #39ff14;
-            color: #000;
-            box-shadow: 0 0 20px #39ff14, inset 0 0 10px #39ff14;
+            box-shadow: 0 6px 0 0 #00A676;
         }
         
-        .neon-btn-green.solid {
-            background: #39ff14;
+        .btn-yellow {
+            background-color: var(--quiz-yellow);
             color: #000;
-            box-shadow: 0 0 15px #39ff14;
-        }
-        .neon-btn-green.solid:hover {
-            background: #32e011;
-            box-shadow: 0 0 25px #39ff14;
+            box-shadow: 0 6px 0 0 #CC9900;
         }
 
-        /* PIN Input */
+        .btn-pink {
+            background-color: var(--quiz-pink);
+            color: #fff;
+            box-shadow: 0 6px 0 0 #CC0055;
+        }
+
+        .btn-purple {
+            background-color: var(--quiz-purple-dark);
+            color: #fff;
+            box-shadow: 0 6px 0 0 #1D0A3D;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        /* PIN Inputs */
         .pin-input {
-            width: 40px;
-            height: 50px;
+            width: 45px;
+            height: 55px;
             text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            background: #1a1a24;
-            border: 2px solid #333;
-            color: #00ffcc;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            font-size: 28px;
+            font-weight: 700;
+            background: #fff;
+            border: 2px solid #ccc;
+            color: #000;
+            border-radius: 12px;
+            transition: all 0.2s;
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.1);
         }
         .pin-input:focus {
             outline: none;
-            border-color: #00ffcc;
-            box-shadow: 0 0 10px #00ffcc;
+            border-color: var(--quiz-teal);
+            box-shadow: 0 0 0 4px rgba(0, 229, 163, 0.3), inset 0 3px 5px rgba(0,0,0,0.1);
         }
 
-        /* Modals & Cards */
+        /* Modals & Panels */
         .glass-panel {
-            background: rgba(26, 26, 36, 0.85);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 255, 204, 0.2);
-            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .white-panel {
+            background: #ffffff;
+            color: #333;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         /* Avatars */
         .avatar-option {
-            font-size: 2rem;
+            font-size: 2.5rem;
             cursor: pointer;
-            padding: 8px;
-            border-radius: 12px;
-            border: 2px solid transparent;
-            transition: all 0.2s;
+            padding: 10px;
+            border-radius: 16px;
+            border: 3px solid transparent;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: #f0f0f0;
         }
         .avatar-option:hover {
-            transform: scale(1.1);
+            transform: scale(1.15) translateY(-5px);
         }
         .avatar-option.selected {
-            border-color: #00ffcc;
-            background: rgba(0, 255, 204, 0.1);
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+            border-color: var(--quiz-teal);
+            background: #e6fff7;
+            transform: scale(1.15) translateY(-5px);
+            animation: bounce 0.5s;
         }
 
-        /* Answers */
+        @keyframes bounce {
+            0%, 100% { transform: scale(1.15) translateY(-5px); }
+            50% { transform: scale(1.15) translateY(-15px); }
+        }
+
+        /* Lobby Cards */
+        .lobby-card {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        
+        @keyframes popIn {
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Answer Buttons (A, B, C, D colors) */
+        .ans-0 { background-color: var(--quiz-red); box-shadow: 0 6px 0 0 #A0132A; color: white;}
+        .ans-1 { background-color: var(--quiz-blue); box-shadow: 0 6px 0 0 #1D6FA5; color: white;}
+        .ans-2 { background-color: var(--quiz-yellow); box-shadow: 0 6px 0 0 #B29100; color: black;}
+        .ans-3 { background-color: var(--quiz-green); box-shadow: 0 6px 0 0 #195908; color: white;}
+        
         .answer-btn {
-            background: #1a1a24;
-            border: 2px solid #444;
-            border-radius: 12px;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .answer-btn:hover:not(:disabled) {
-            border-color: #00ffcc;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
-            transform: translateY(-2px);
-        }
-        .answer-btn.correct {
-            background: #155724;
-            border-color: #39ff14;
-            box-shadow: 0 0 15px #39ff14;
-            color: #fff;
-        }
-        .answer-btn.wrong {
-            background: #721c24;
-            border-color: #ff003c;
-            box-shadow: 0 0 15px #ff003c;
-            color: #fff;
-        }
-        .answer-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        /* Timer ring */
-        .timer-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 4px solid #333;
+            border-radius: 16px;
+            font-size: 1.25rem;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
             position: relative;
+            transition: all 0.1s ease-in-out;
+            padding: 20px;
         }
-        .timer-circle.active {
-            border-color: #00ffcc;
-            box-shadow: 0 0 15px #00ffcc;
-            color: #00ffcc;
+        .answer-btn:active:not(:disabled) {
+            top: 4px;
+            box-shadow: 0 0px 0 0 transparent !important;
         }
-        .timer-circle.warning {
-            border-color: #ff003c;
-            box-shadow: 0 0 15px #ff003c;
-            color: #ff003c;
-            animation: pulse 1s infinite;
+        .answer-btn:disabled {
+            opacity: 0.9;
+            cursor: not-allowed;
+            top: 4px;
+            box-shadow: 0 0px 0 0 transparent !important;
+            filter: grayscale(80%);
+        }
+        .answer-btn.correct-show {
+            filter: grayscale(0%);
+            border: 4px solid #fff;
+            animation: pulse-correct 1s infinite;
+        }
+        .answer-btn.wrong-show {
+            filter: grayscale(0%);
+            animation: shake 0.5s;
         }
 
-        @keyframes pulse {
+        @keyframes pulse-correct {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
 
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Energy Bar Timer */
+        .energy-bar-container {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .energy-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #00E5A3, #FFD000, #FF3385);
+            background-size: 200% 100%;
+            transition: width 1s linear;
+        }
+        .energy-bar-fill.warning {
+            background: var(--quiz-red);
+            animation: pulse-bar 0.5s infinite alternate;
+        }
+
+        @keyframes pulse-bar {
+            from { opacity: 1; }
+            to { opacity: 0.5; }
+        }
+
+        .hidden-view { display: none !important; }
+        
         @keyframes fade-in {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in {
-            animation: fade-in 0.3s ease-out forwards;
+            animation: fade-in 0.4s ease-out forwards;
         }
-
-        /* Leaderboard */
-        .lb-rank-1 { color: #ffd700; text-shadow: 0 0 10px #ffd700; }
-        .lb-rank-2 { color: #c0c0c0; text-shadow: 0 0 10px #c0c0c0; }
-        .lb-rank-3 { color: #cd7f32; text-shadow: 0 0 10px #cd7f32; }
-
-        .hidden-view { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col relative">
+<body class="flex flex-col relative">
+
+    <!-- Audio Player for Lobby -->
+    <audio id="lobby-audio" loop preload="auto">
+        <!-- Placeholder generic happy tune link, can be replaced -->
+        <source src="https://assets.mixkit.co/music/preview/mixkit-happy-times-158.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- Header -->
-    <header class="p-4 flex justify-between items-center border-b border-gray-800 glass-panel z-50 relative">
+    <header class="p-4 flex justify-between items-center z-50 relative bg-black/20 backdrop-blur-md">
         <div class="flex items-center gap-3 cursor-pointer" onclick="app.navigate('home')">
-            <div class="w-10 h-10 rounded-full neon-border flex items-center justify-center text-2xl font-bold neon-text">
+            <div class="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-3xl font-black text-[var(--quiz-purple)] rotate-[-5deg]">
                 Q
             </div>
-            <h1 class="text-2xl font-bold tracking-wider neon-text uppercase hidden sm:block">Quizgame</h1>
+            <h1 class="text-3xl font-black tracking-wide hidden sm:block text-white" style="-webkit-text-stroke: 1px rgba(0,0,0,0.2);">Quizgame</h1>
         </div>
-        <div>
-            <button id="btn-login-header" onclick="app.showLoginModal()" class="px-4 py-2 rounded neon-btn font-semibold text-sm">
+        <div class="flex items-center gap-4">
+            <!-- Audio Toggle -->
+            <button id="btn-audio-toggle" onclick="app.toggleAudio()" class="w-10 h-10 rounded-full btn-purple btn-3d text-lg hidden-view">
+                <i class="fas fa-volume-up" id="audio-icon"></i>
+            </button>
+            
+            <button id="btn-login-header" onclick="app.showLoginModal()" class="px-5 py-2 rounded-xl btn-purple btn-3d font-bold text-sm">
                 Đăng nhập Giảng viên
             </button>
-            <button id="btn-logout-header" onclick="app.logout()" class="px-4 py-2 rounded neon-btn font-semibold text-sm hidden-view">
-                Đăng xuất <span id="host-name-display" class="ml-1 text-gray-300 font-normal"></span>
+            <button id="btn-logout-header" onclick="app.logout()" class="px-5 py-2 rounded-xl btn-pink btn-3d font-bold text-sm hidden-view">
+                Đăng xuất <span id="host-name-display" class="ml-1 font-normal opacity-80"></span>
             </button>
         </div>
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-grow flex flex-col items-center justify-center p-4 relative w-full max-w-6xl mx-auto" id="main-container">
+    <main class="flex-grow flex flex-col items-center justify-center p-4 relative w-full max-w-7xl mx-auto" id="main-container">
         
         <!-- ================= VIEW: HOME ================= -->
-        <div id="view-home" class="view-section w-full flex flex-col items-center animate-fade-in">
-            <div class="text-center mb-10">
-                <div class="w-32 h-32 mx-auto rounded-full neon-border flex items-center justify-center text-6xl font-bold neon-text mb-6">
-                    Q
-                </div>
-                <h2 class="text-4xl md:text-6xl font-bold mb-4">Sẵn sàng thử thách?</h2>
-                <p class="text-gray-400 text-lg">Nền tảng thi trắc nghiệm trực tuyến thời gian thực</p>
+        <div id="view-home" class="view-section w-full flex flex-col items-center animate-fade-in my-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl md:text-7xl font-black mb-4 text-white" style="text-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                    Sẵn sàng thử thách?
+                </h2>
+                <p class="text-white/80 text-xl font-semibold">Nền tảng thi trắc nghiệm trực tuyến thời gian thực</p>
             </div>
-            <button onclick="app.showJoinModal()" class="px-10 py-4 text-xl font-bold rounded-lg neon-btn-green solid uppercase tracking-wider animate-pulse hover:animate-none">
+            <button onclick="app.showJoinModal()" class="px-12 py-5 text-2xl font-black rounded-2xl btn-teal btn-3d tracking-wider animate-bounce hover:animate-none">
                 VÀO CHƠI GAME
             </button>
         </div>
 
         <!-- ================= VIEW: HOST DASHBOARD ================= -->
-        <div id="view-host-dashboard" class="view-section w-full hidden-view animate-fade-in">
-            <div class="flex flex-col lg:flex-row gap-6 w-full h-full">
-                <!-- Left: Control Panel -->
-                <div class="flex-1 glass-panel p-6 flex flex-col items-center">
-                    <h2 class="text-2xl font-bold mb-6 text-center text-gray-300">Quản lý Phòng Thi</h2>
-                    
-                    <div class="bg-black/50 p-6 rounded-xl border border-gray-700 w-full text-center mb-6">
-                        <p class="text-gray-400 mb-2">Mã PIN phòng (chia sẻ cho Sinh viên)</p>
-                        <div class="text-6xl font-black tracking-widest neon-text mb-4" id="host-pin-display">
-                            ------
-                        </div>
-                        <button onclick="app.generateNewPin()" class="px-4 py-2 rounded text-sm text-gray-300 border border-gray-600 hover:bg-gray-800 transition">
-                            <i class="fas fa-sync-alt mr-1"></i> Đổi PIN mới
-                        </button>
+        <div id="view-host-dashboard" class="view-section w-full hidden-view animate-fade-in flex flex-col h-full my-4">
+            
+            <!-- Host Top Bar -->
+            <div class="flex flex-col md:flex-row justify-between items-center bg-white rounded-3xl p-6 shadow-2xl mb-6 gap-6 relative">
+                
+                <div class="flex flex-col items-center text-center">
+                    <p class="text-gray-500 font-bold uppercase tracking-widest text-sm mb-1">Mã PIN Phòng Thi</p>
+                    <div class="text-7xl md:text-8xl font-black text-[var(--quiz-purple)] tracking-widest leading-none" id="host-pin-display">
+                        ------
                     </div>
-
-                    <div class="w-full bg-black/30 p-4 rounded-lg mb-6 text-center">
-                        <div class="text-lg text-gray-300">Sinh viên đã tham gia: <span id="host-player-count" class="font-bold text-2xl neon-text">0</span></div>
-                    </div>
-
-                    <button id="host-start-btn" onclick="app.hostStartGame()" class="w-full py-4 text-xl font-bold rounded-lg neon-btn-green solid uppercase tracking-wider mt-auto" disabled>
+                    <button onclick="app.generateNewPin()" class="mt-4 px-4 py-2 rounded-xl btn-purple btn-3d text-sm font-bold flex items-center gap-2">
+                        <i class="fas fa-sync-alt"></i> Đổi PIN mới
+                    </button>
+                </div>
+                
+                <div class="flex flex-col items-center justify-center">
+                    <button id="host-start-btn" onclick="app.hostStartGame()" class="px-10 py-6 text-2xl md:text-3xl font-black rounded-2xl btn-teal btn-3d tracking-wider whitespace-nowrap" disabled>
                         🚀 BẮT ĐẦU LÀM BÀI
                     </button>
                 </div>
+            </div>
 
-                <!-- Right: Tabs (Players / Question Bank) -->
-                <div class="flex-[2] glass-panel p-6 flex flex-col h-[600px]">
-                    <div class="flex border-b border-gray-700 mb-4">
-                        <button class="px-4 py-2 font-semibold text-green-400 border-b-2 border-green-400" id="tab-players-btn" onclick="app.switchHostTab('players')">Danh sách Sinh viên</button>
-                        <button class="px-4 py-2 font-semibold text-gray-500 hover:text-gray-300" id="tab-questions-btn" onclick="app.switchHostTab('questions')">Ngân hàng Câu hỏi</button>
+            <div class="flex flex-col lg:flex-row gap-6 flex-grow min-h-[500px]">
+                
+                <!-- Left: Players Tab -->
+                <div class="flex-[2] glass-panel p-6 flex flex-col">
+                    <div class="flex justify-between items-center mb-6 border-b border-white/20 pb-4">
+                        <h2 class="text-2xl font-bold">Danh sách Sinh viên</h2>
+                        <div class="bg-white/20 px-4 py-1 rounded-full font-bold">
+                            <span id="host-player-count">0</span> người
+                        </div>
                     </div>
-
-                    <!-- Players Tab -->
-                    <div id="host-tab-players" class="flex-1 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 content-start">
+                    
+                    <div id="host-tab-players" class="flex-1 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 content-start">
                         <!-- Player cards injected here -->
                     </div>
+                </div>
 
-                    <!-- Questions Tab -->
-                    <div id="host-tab-questions" class="flex-1 overflow-y-auto pr-2 custom-scrollbar hidden-view">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-lg">Chủ đề: Công nghệ thông tin</h3>
-                            <span class="bg-gray-800 px-3 py-1 rounded text-sm text-gray-300" id="host-q-count">0 câu</span>
-                        </div>
-                        <div class="space-y-4" id="host-questions-list">
-                            <!-- Questions injected here -->
-                        </div>
+                <!-- Right: Questions Bank -->
+                <div class="flex-1 glass-panel p-6 flex flex-col bg-black/20">
+                    <div class="flex justify-between items-center mb-6 border-b border-white/20 pb-4">
+                        <h2 class="text-2xl font-bold">Ngân hàng Câu hỏi</h2>
+                        <span class="bg-[var(--quiz-pink)] px-3 py-1 rounded-full text-sm font-bold shadow-md" id="host-q-count">0 câu</span>
+                    </div>
+                    <div class="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1" id="host-questions-list">
+                        <!-- Questions injected here -->
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- ================= VIEW: STUDENT LOBBY ================= -->
-        <div id="view-student-lobby" class="view-section w-full hidden-view animate-fade-in flex flex-col items-center">
-            <div class="glass-panel p-8 text-center max-w-md w-full">
-                <div class="text-6xl mb-4" id="lobby-student-avatar">😎</div>
-                <h2 class="text-2xl font-bold mb-2" id="lobby-student-name">Tên Sinh Viên</h2>
-                <div class="mt-6 p-4 bg-black/50 rounded-lg border border-gray-700">
-                    <p class="text-green-400 font-semibold mb-2"><i class="fas fa-check-circle mr-1"></i> Đã vào phòng thành công!</p>
-                    <p class="text-gray-400 text-sm">Hãy đợi Giảng viên bắt đầu trò chơi...</p>
-                    <div class="mt-4 flex justify-center space-x-2">
-                        <div class="w-3 h-3 bg-gray-600 rounded-full animate-bounce"></div>
-                        <div class="w-3 h-3 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                        <div class="w-3 h-3 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+        <div id="view-student-lobby" class="view-section w-full hidden-view animate-fade-in flex flex-col h-full my-4">
+            <div class="text-center mb-8 bg-white/10 p-6 rounded-3xl backdrop-blur-sm max-w-2xl mx-auto w-full border border-white/20 shadow-2xl">
+                <p class="text-[var(--quiz-teal)] font-bold text-xl mb-2"><i class="fas fa-check-circle mr-2"></i>Đã vào phòng thành công!</p>
+                <h2 class="text-3xl font-black mb-4">Hãy đợi Giảng viên bắt đầu...</h2>
+                <div class="flex justify-center space-x-3 mb-6">
+                    <div class="w-4 h-4 bg-white rounded-full animate-bounce"></div>
+                    <div class="w-4 h-4 bg-white rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                    <div class="w-4 h-4 bg-white rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                </div>
+                
+                <div class="inline-flex items-center gap-4 bg-black/30 p-4 rounded-2xl">
+                    <div class="text-6xl" id="lobby-student-avatar">😎</div>
+                    <div class="text-left">
+                        <div class="text-gray-300 text-sm font-bold uppercase">Bạn</div>
+                        <div class="text-2xl font-bold" id="lobby-student-name">Tên Sinh Viên</div>
                     </div>
                 </div>
-                <div class="mt-6 text-sm text-gray-500">
-                    Đang có <span id="lobby-player-count" class="font-bold text-white">1</span> người trong phòng.
+            </div>
+            
+            <div class="flex-grow glass-panel p-6 max-w-5xl mx-auto w-full">
+                <div class="flex justify-between items-center mb-6 border-b border-white/20 pb-2">
+                    <h3 class="font-bold text-xl">Các bạn cùng lớp</h3>
+                    <div class="bg-white/20 px-3 py-1 rounded-full text-sm font-bold">
+                        <span id="lobby-player-count">1</span> người
+                    </div>
+                </div>
+                
+                <div id="lobby-players-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4 content-start">
+                    <!-- Classmates injected here -->
                 </div>
             </div>
         </div>
 
         <!-- ================= VIEW: COUNTDOWN TO START ================= -->
-        <div id="view-game-countdown" class="view-section w-full hidden-view animate-fade-in flex flex-col items-center justify-center absolute inset-0 bg-[#0f0f13] z-40">
-            <h2 class="text-3xl font-bold mb-8 text-gray-300">Trò chơi sẽ bắt đầu sau...</h2>
-            <div class="text-[150px] font-black neon-text animate-pulse" id="game-countdown-number">3</div>
+        <div id="view-game-countdown" class="view-section w-full hidden-view animate-fade-in flex flex-col items-center justify-center absolute inset-0 z-40 bg-[var(--quiz-purple)]">
+            <h2 class="text-4xl md:text-6xl font-black mb-8 text-white text-center">Sẵn sàng!</h2>
+            <div class="text-[200px] font-black text-[var(--quiz-yellow)] drop-shadow-[0_10px_0_#CC9900] animate-bounce" id="game-countdown-number" style="line-height: 1;">3</div>
         </div>
 
         <!-- ================= VIEW: GAME (QUESTION) ================= -->
-        <div id="view-game" class="view-section w-full hidden-view animate-fade-in h-[80vh] flex flex-col">
+        <div id="view-game" class="view-section w-full hidden-view animate-fade-in flex flex-col h-[85vh] max-w-5xl mx-auto">
+            
             <!-- Game Header -->
-            <div class="flex justify-between items-center mb-6">
-                <div class="bg-gray-800 px-4 py-2 rounded-lg font-bold">
-                    Câu <span id="game-q-current">1</span>/<span id="game-q-total">5</span>
+            <div class="flex justify-between items-center mb-4 bg-black/20 p-4 rounded-2xl backdrop-blur-sm">
+                <div class="font-bold text-xl bg-white/20 px-4 py-2 rounded-xl">
+                    Câu <span id="game-q-current">1</span> / <span id="game-q-total">5</span>
                 </div>
-                <div class="timer-circle active" id="game-timer">15</div>
-                <div class="bg-gray-800 px-4 py-2 rounded-lg flex items-center gap-2">
-                    <span id="game-player-avatar"></span> <span id="game-player-score" class="font-bold text-green-400">0</span> điểm
+                <div class="flex items-center gap-3 bg-white/20 px-4 py-2 rounded-xl">
+                    <span id="game-player-avatar" class="text-2xl"></span> 
+                    <span id="game-player-name" class="font-bold hidden sm:inline"></span>
+                    <div class="bg-black/40 px-3 py-1 rounded-lg">
+                        <span id="game-player-score" class="font-black text-[var(--quiz-teal)]">0</span>
+                    </div>
                 </div>
             </div>
 
+            <!-- Energy Bar Timer -->
+            <div class="energy-bar-container mb-6 shadow-inner">
+                <div class="energy-bar-fill" id="game-timer-bar"></div>
+            </div>
+
             <!-- Question -->
-            <div class="glass-panel p-8 mb-8 text-center min-h-[150px] flex items-center justify-center">
-                <h2 class="text-2xl md:text-3xl font-bold leading-relaxed" id="game-question-text">
+            <div class="white-panel p-8 mb-6 text-center min-h-[150px] flex items-center justify-center relative shadow-[0_10px_0_0_rgba(0,0,0,0.1)]">
+                <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-[var(--quiz-pink)] text-white font-black px-6 py-2 rounded-full border-4 border-white shadow-md z-10 text-xl" id="game-timer-text">
+                    15
+                </div>
+                <h2 class="text-2xl md:text-4xl font-bold leading-relaxed text-[var(--quiz-purple-dark)]" id="game-question-text">
                     Đang tải câu hỏi...
                 </h2>
             </div>
@@ -336,97 +414,110 @@
             </div>
 
             <!-- Feedback Overlay (Correct/Wrong) -->
-            <div id="game-feedback" class="absolute inset-0 flex items-center justify-center bg-black/80 z-20 hidden-view opacity-0 transition-opacity duration-300">
-                <div class="text-center transform scale-50 transition-transform duration-300" id="game-feedback-content">
-                    <div id="game-feedback-icon" class="text-8xl mb-4">✅</div>
-                    <div id="game-feedback-text" class="text-4xl font-bold">Chính xác!</div>
-                    <div id="game-feedback-points" class="text-2xl mt-2 text-green-400"></div>
+            <div id="game-feedback" class="absolute inset-0 flex items-center justify-center z-50 hidden-view bg-black/60 backdrop-blur-sm transition-opacity duration-300 opacity-0 rounded-3xl">
+                <div class="text-center transform scale-50 transition-transform duration-300 bg-white p-10 rounded-3xl shadow-2xl" id="game-feedback-content">
+                    <div id="game-feedback-icon" class="text-8xl mb-4"></div>
+                    <div id="game-feedback-text" class="text-5xl font-black mb-2 uppercase"></div>
+                    <div id="game-feedback-points" class="text-3xl font-bold bg-gray-100 inline-block px-6 py-2 rounded-full mt-2"></div>
                 </div>
             </div>
         </div>
 
         <!-- ================= VIEW: LEADERBOARD ================= -->
-        <div id="view-leaderboard" class="view-section w-full hidden-view animate-fade-in flex flex-col items-center">
-            <h2 class="text-4xl font-bold mb-2 neon-text">Bảng Xếp Hạng</h2>
-            <p class="text-gray-400 mb-8" id="lb-subtitle">Top 5 Sinh viên xuất sắc nhất</p>
+        <div id="view-leaderboard" class="view-section w-full hidden-view animate-fade-in flex flex-col items-center justify-center h-full max-w-3xl mx-auto my-4">
+            
+            <div class="text-center mb-6">
+                <h2 class="text-5xl font-black mb-2 text-[var(--quiz-yellow)] drop-shadow-md">Bảng Xếp Hạng</h2>
+                <p class="text-white/80 font-bold text-xl" id="lb-subtitle">Top 5 Sinh viên xuất sắc nhất</p>
+            </div>
 
-            <div class="w-full max-w-2xl glass-panel p-6 mb-8">
+            <div class="w-full white-panel p-2 sm:p-6 mb-8 bg-opacity-95">
                 <div class="space-y-3" id="lb-list">
                     <!-- Leaderboard items injected here -->
                 </div>
             </div>
 
-            <div class="text-center" id="lb-next-info">
-                <p class="text-gray-400 mb-2">Câu hỏi tiếp theo sau</p>
-                <div class="timer-circle active mx-auto" id="lb-timer" style="width: 60px; height: 60px; font-size: 1.5rem;">3</div>
+            <div class="text-center bg-black/30 p-6 rounded-3xl backdrop-blur-sm" id="lb-next-info">
+                <p class="text-white/80 font-bold text-lg mb-3">Câu hỏi tiếp theo sau</p>
+                <div class="text-5xl font-black text-[var(--quiz-teal)]" id="lb-timer">3</div>
             </div>
             
-            <div class="text-center hidden-view" id="lb-final-info">
-                <h3 class="text-2xl font-bold text-green-400 mb-4">🎉 Trò chơi kết thúc! 🎉</h3>
-                <button onclick="app.exitGame()" class="px-6 py-2 rounded neon-btn">Thoát về trang chủ</button>
+            <div class="text-center hidden-view bg-black/30 p-8 rounded-3xl backdrop-blur-sm" id="lb-final-info">
+                <h3 class="text-4xl font-black text-[var(--quiz-teal)] mb-6">🎉 Trò chơi kết thúc! 🎉</h3>
+                <button onclick="app.exitGame()" class="px-8 py-4 rounded-xl btn-pink btn-3d font-black text-xl">Thoát về trang chủ</button>
             </div>
         </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="p-4 text-center border-t border-gray-800 text-gray-500 text-sm mt-auto relative z-10 bg-[#0f0f13]">
-        Phạm Ngọc Thái &copy; 2026 | Full-stack Quizgame
+    <footer class="p-4 text-center text-white/50 font-semibold text-sm mt-auto relative z-10">
+        Phạm Ngọc Thái &copy; 2026 | Quizizz Style Online Game
     </footer>
 
     <!-- ================= MODALS ================= -->
 
     <!-- Host Login Modal -->
-    <div id="modal-login" class="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center hidden-view">
-        <div class="glass-panel p-8 w-full max-w-md animate-fade-in mx-4 relative">
-            <button onclick="app.closeModals()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
-            <h2 class="text-2xl font-bold mb-6 text-center">Đăng nhập Giảng viên</h2>
+    <div id="modal-login" class="fixed inset-0 bg-[var(--quiz-purple-dark)]/90 z-[100] flex items-center justify-center hidden-view backdrop-blur-sm">
+        <div class="white-panel p-8 w-full max-w-md animate-fade-in mx-4 relative border-4 border-[var(--quiz-purple)]">
+            <button onclick="app.closeModals()" class="absolute -top-4 -right-4 w-10 h-10 bg-[var(--quiz-red)] text-white rounded-full font-bold shadow-lg border-2 border-white hover:scale-110 transition"><i class="fas fa-times"></i></button>
+            
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-[var(--quiz-purple)] text-white rounded-xl mx-auto flex items-center justify-center text-4xl mb-4 shadow-md rotate-3">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h2 class="text-2xl font-black text-gray-800">Đăng nhập Giảng viên</h2>
+            </div>
+            
             <form id="form-login" onsubmit="app.handleLogin(event)">
                 <div class="mb-4">
-                    <label class="block text-sm text-gray-400 mb-1">Tài khoản</label>
-                    <input type="text" id="login-username" class="w-full bg-gray-800 border border-gray-600 rounded p-2 text-white focus:border-green-400 outline-none" required>
+                    <label class="block text-sm font-bold text-gray-500 mb-1">Tài khoản</label>
+                    <input type="text" id="login-username" class="w-full bg-gray-100 border-2 border-gray-200 rounded-xl p-3 text-gray-800 font-bold focus:border-[var(--quiz-purple)] outline-none transition" required>
                 </div>
                 <div class="mb-6">
-                    <label class="block text-sm text-gray-400 mb-1">Mật khẩu</label>
-                    <input type="password" id="login-password" class="w-full bg-gray-800 border border-gray-600 rounded p-2 text-white focus:border-green-400 outline-none" required>
+                    <label class="block text-sm font-bold text-gray-500 mb-1">Mật khẩu</label>
+                    <input type="password" id="login-password" class="w-full bg-gray-100 border-2 border-gray-200 rounded-xl p-3 text-gray-800 font-bold focus:border-[var(--quiz-purple)] outline-none transition" required>
                 </div>
-                <div id="login-error" class="text-red-500 text-sm mb-4 hidden-view text-center">Tài khoản hoặc mật khẩu không đúng.</div>
-                <button type="submit" class="w-full py-2 rounded neon-btn-green font-bold">ĐĂNG NHẬP</button>
+                <div id="login-error" class="text-[var(--quiz-red)] font-bold text-sm mb-4 hidden-view text-center bg-red-50 p-2 rounded-lg">Tài khoản hoặc mật khẩu không đúng!</div>
+                <button type="submit" class="w-full py-4 rounded-xl btn-purple btn-3d font-black text-lg">ĐĂNG NHẬP</button>
             </form>
-            <div class="mt-4 text-xs text-center text-gray-500">Mặc định: admin / admin123</div>
+            <div class="mt-6 text-sm text-center text-gray-400 font-bold">Mặc định: admin / admin123</div>
         </div>
     </div>
 
     <!-- Student Join Modal -->
-    <div id="modal-join" class="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center hidden-view">
-        <div class="glass-panel p-6 md:p-8 w-full max-w-lg animate-fade-in mx-4 relative overflow-y-auto max-h-[90vh] custom-scrollbar">
-            <button onclick="app.closeModals()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+    <div id="modal-join" class="fixed inset-0 bg-[var(--quiz-purple-dark)]/90 z-[100] flex items-center justify-center hidden-view backdrop-blur-sm">
+        <div class="white-panel p-6 md:p-8 w-full max-w-xl animate-fade-in mx-4 relative border-4 border-[var(--quiz-purple)] overflow-y-auto max-h-[90vh] custom-scrollbar">
+            <button onclick="app.closeModals()" class="absolute -top-4 -right-4 w-10 h-10 bg-[var(--quiz-red)] text-white rounded-full font-bold shadow-lg border-2 border-white hover:scale-110 transition"><i class="fas fa-times"></i></button>
             
-            <h2 class="text-2xl font-bold mb-6 text-center neon-text">Vào phòng thi trắc nghiệm</h2>
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-black text-[var(--quiz-purple-dark)] mb-2">Vào phòng thi</h2>
+                <p class="text-gray-500 font-bold">Hãy nhập thông tin để tham gia ngay!</p>
+            </div>
             
             <form id="form-join" onsubmit="app.handleJoin(event)">
                 <!-- Name -->
-                <div class="mb-6">
-                    <label class="block text-sm text-gray-400 mb-2 font-semibold">Họ và tên / Mã sinh viên</label>
-                    <input type="text" id="join-name" class="w-full bg-gray-900 border-2 border-gray-700 rounded-lg p-3 text-lg text-white focus:border-green-400 outline-none transition" placeholder="Nhập tên của bạn..." required autocomplete="off">
+                <div class="mb-6 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <label class="block text-sm text-gray-500 mb-2 font-bold uppercase tracking-wider">Họ và tên / Mã SV</label>
+                    <input type="text" id="join-name" class="w-full bg-white border-2 border-gray-300 rounded-xl p-4 text-xl font-bold text-gray-800 focus:border-[var(--quiz-teal)] outline-none transition shadow-inner" placeholder="Nhập tên của bạn..." required autocomplete="off">
                 </div>
 
                 <!-- Avatar Selection -->
-                <div class="mb-6">
-                    <div class="flex justify-between items-end mb-2">
-                        <label class="block text-sm text-gray-400 font-semibold">Chọn Avatar</label>
-                        <button type="button" onclick="app.randomAvatar()" class="text-xs text-green-400 hover:text-green-300"><i class="fas fa-dice"></i> Ngẫu nhiên</button>
+                <div class="mb-6 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="block text-sm text-gray-500 font-bold uppercase tracking-wider">Chọn Avatar</label>
+                        <button type="button" onclick="app.randomAvatar()" class="text-sm font-bold text-[var(--quiz-pink)] hover:text-pink-600 bg-pink-50 px-3 py-1 rounded-lg transition"><i class="fas fa-dice mr-1"></i> Ngẫu nhiên</button>
                     </div>
-                    <div class="grid grid-cols-4 sm:grid-cols-6 gap-2" id="avatar-grid">
+                    <div class="grid grid-cols-4 sm:grid-cols-6 gap-3" id="avatar-grid">
                         <!-- Rendered via JS -->
                     </div>
                     <input type="hidden" id="join-avatar" required>
                 </div>
 
                 <!-- PIN -->
-                <div class="mb-8">
-                    <label class="block text-sm text-gray-400 mb-2 font-semibold text-center">Mã PIN phòng thi (6 số)</label>
-                    <div class="flex justify-center gap-2 sm:gap-3" id="pin-inputs">
+                <div class="mb-8 bg-[var(--quiz-purple-dark)] p-6 rounded-2xl shadow-inner text-center">
+                    <label class="block text-sm text-white/80 mb-4 font-bold uppercase tracking-wider">Mã PIN phòng (6 số)</label>
+                    <div class="flex justify-center gap-2 sm:gap-4" id="pin-inputs">
                         <input type="text" class="pin-input" maxlength="1" oninput="app.handlePinInput(event, 0)" onkeydown="app.handlePinKeydown(event, 0)" autocomplete="off">
                         <input type="text" class="pin-input" maxlength="1" oninput="app.handlePinInput(event, 1)" onkeydown="app.handlePinKeydown(event, 1)" autocomplete="off">
                         <input type="text" class="pin-input" maxlength="1" oninput="app.handlePinInput(event, 2)" onkeydown="app.handlePinKeydown(event, 2)" autocomplete="off">
@@ -434,11 +525,11 @@
                         <input type="text" class="pin-input" maxlength="1" oninput="app.handlePinInput(event, 4)" onkeydown="app.handlePinKeydown(event, 4)" autocomplete="off">
                         <input type="text" class="pin-input" maxlength="1" oninput="app.handlePinInput(event, 5)" onkeydown="app.handlePinKeydown(event, 5)" autocomplete="off">
                     </div>
-                    <div id="join-error" class="text-red-500 text-sm mt-3 hidden-view text-center font-semibold bg-red-500/10 py-2 rounded">Mã PIN không chính xác! Vui lòng kiểm tra màn hình Giảng viên.</div>
+                    <div id="join-error" class="text-[var(--quiz-yellow)] font-bold text-sm mt-4 hidden-view bg-black/30 py-2 rounded-lg inline-block px-4"><i class="fas fa-exclamation-triangle mr-1"></i> Mã PIN không chính xác!</div>
                 </div>
 
-                <button type="submit" class="w-full py-4 rounded-lg neon-btn-green solid font-bold text-lg uppercase tracking-wider">
-                    VÀO PHÒNG CHỜ GIẢNG VIÊN
+                <button type="submit" class="w-full py-5 rounded-2xl btn-teal btn-3d font-black text-2xl uppercase tracking-wider text-gray-900">
+                    VÀO PHÒNG CHỜ
                 </button>
             </form>
         </div>
@@ -480,9 +571,9 @@
             currentUser: null, // null, 'host', or {id, name, avatar, score}
             currentView: 'home',
             
-            // Host state
-            hostTab: 'players',
-            
+            // Audio state
+            audioEnabled: false,
+
             // Game loop state
             gameInterval: null,
             timerValue: 0,
@@ -492,40 +583,68 @@
 
         const StorageKeys = {
             PIN: 'quizgame_pin',
-            PLAYERS: 'quizgame_players', // Array of player objects
-            STATE: 'quizgame_game_state', // 'waiting', 'playing', 'ended'
-            SYNC_Q: 'quizgame_sync_q_index', // current question index to sync
+            PLAYERS: 'quizgame_players',
+            STATE: 'quizgame_game_state',
+            SYNC_Q: 'quizgame_sync_q_index',
         };
 
         const app = {
             init() {
-                // Render questions in host bank
                 this.renderHostQuestions();
-                
-                // Render avatars in join form
                 this.renderAvatars();
-
-                // Setup storage listener for cross-tab sync
                 window.addEventListener('storage', (e) => this.handleStorageEvent(e));
-
-                // Check initial local state to restore session
-                this.restoreSession();
-            },
-
-            restoreSession() {
-                // Simplified session logic. Real app would be more robust.
-                const state = localStorage.getItem(StorageKeys.STATE);
-                
-                // If we are marked as host in memory (won't persist refresh naturally without session cookies, 
-                // but we keep it simple for this single file UI demo)
-                // Actually, let's reset to home on fresh load unless we build a full session manager.
                 this.navigate('home');
-                this.clearGameStorage(); // Clean slate for demo purposes on load
+                
+                // Show audio button
+                document.getElementById('btn-audio-toggle').classList.remove('hidden-view');
             },
 
-            clearGameStorage() {
-                // Only clear if no one is playing, to be safe. But for demo, let's reset on Host login.
+            // --- AUDIO & EFFECTS ---
+            toggleAudio() {
+                AppState.audioEnabled = !AppState.audioEnabled;
+                const audio = document.getElementById('lobby-audio');
+                const icon = document.getElementById('audio-icon');
+                
+                if (AppState.audioEnabled) {
+                    audio.volume = 0.3;
+                    audio.play().catch(e => {
+                        console.log("Audio autoplay blocked by browser");
+                        AppState.audioEnabled = false;
+                        icon.className = 'fas fa-volume-mute';
+                    });
+                    if(AppState.audioEnabled) icon.className = 'fas fa-volume-up';
+                } else {
+                    audio.pause();
+                    icon.className = 'fas fa-volume-mute';
+                }
             },
+
+            triggerConfetti() {
+                const duration = 3000;
+                const end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({
+                        particleCount: 5,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 },
+                        colors: ['#00E5A3', '#FFD000', '#FF3385', '#2D9CDB']
+                    });
+                    confetti({
+                        particleCount: 5,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 },
+                        colors: ['#00E5A3', '#FFD000', '#FF3385', '#2D9CDB']
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+            },
+
 
             // --- NAVIGATION & UI ---
             navigate(viewId) {
@@ -539,13 +658,13 @@
                 document.getElementById('modal-join').classList.add('hidden-view');
                 document.getElementById('join-error').classList.add('hidden-view');
                 document.getElementById('login-error').classList.add('hidden-view');
-                
-                // Reset PIN inputs
                 document.querySelectorAll('.pin-input').forEach(input => input.value = '');
             },
 
             showLoginModal() {
                 document.getElementById('modal-login').classList.remove('hidden-view');
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
                 document.getElementById('login-username').focus();
             },
 
@@ -554,8 +673,6 @@
                 document.getElementById('join-name').value = '';
                 document.getElementById('join-name').focus();
                 this.randomAvatar();
-                
-                // Clear PIN inputs completely
                 document.querySelectorAll('.pin-input').forEach(input => input.value = '');
                 document.getElementById('join-error').classList.add('hidden-view');
             },
@@ -567,16 +684,13 @@
                 const p = document.getElementById('login-password').value;
 
                 if (u === 'admin' && p === 'admin123') {
-                    // Success
                     AppState.currentUser = 'host';
                     this.closeModals();
                     
-                    // Update Header
                     document.getElementById('btn-login-header').classList.add('hidden-view');
                     document.getElementById('btn-logout-header').classList.remove('hidden-view');
-                    document.getElementById('host-name-display').innerText = '(Phạm Ngọc Thái)';
+                    document.getElementById('host-name-display').innerText = '(GV: Phạm Ngọc Thái)';
 
-                    // Setup Host Data
                     this.setupHostRoom();
                     this.navigate('host-dashboard');
                 } else {
@@ -588,12 +702,10 @@
                 AppState.currentUser = null;
                 document.getElementById('btn-login-header').classList.remove('hidden-view');
                 document.getElementById('btn-logout-header').classList.add('hidden-view');
-                this.clearGameStorage(); // End room
                 this.navigate('home');
             },
 
             setupHostRoom() {
-                // Initialize clean state for a new room
                 localStorage.setItem(StorageKeys.PLAYERS, JSON.stringify([]));
                 localStorage.setItem(StorageKeys.STATE, 'waiting');
                 localStorage.setItem(StorageKeys.SYNC_Q, '-1');
@@ -607,20 +719,6 @@
                 document.getElementById('host-pin-display').innerText = pin;
             },
 
-            switchHostTab(tab) {
-                AppState.hostTab = tab;
-                document.getElementById('tab-players-btn').className = tab === 'players' 
-                    ? "px-4 py-2 font-semibold text-green-400 border-b-2 border-green-400" 
-                    : "px-4 py-2 font-semibold text-gray-500 hover:text-gray-300";
-                
-                document.getElementById('tab-questions-btn').className = tab === 'questions' 
-                    ? "px-4 py-2 font-semibold text-green-400 border-b-2 border-green-400" 
-                    : "px-4 py-2 font-semibold text-gray-500 hover:text-gray-300";
-
-                document.getElementById('host-tab-players').classList.toggle('hidden-view', tab !== 'players');
-                document.getElementById('host-tab-questions').classList.toggle('hidden-view', tab !== 'questions');
-            },
-
             renderHostQuestions() {
                 const container = document.getElementById('host-questions-list');
                 document.getElementById('host-q-count').innerText = `${QUESTIONS.length} câu`;
@@ -628,12 +726,13 @@
                 let html = '';
                 QUESTIONS.forEach((q, idx) => {
                     html += `
-                        <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                            <h4 class="font-bold mb-2">Câu ${idx + 1}: ${q.q}</h4>
-                            <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div class="bg-white p-4 rounded-2xl border-2 border-gray-100 text-gray-800 shadow-sm">
+                            <h4 class="font-bold mb-3 text-lg text-[var(--quiz-purple-dark)]"><span class="bg-[var(--quiz-purple-dark)] text-white px-2 py-1 rounded-lg text-sm mr-2">Q${idx + 1}</span> ${q.q}</h4>
+                            <div class="grid grid-cols-2 gap-2 text-sm font-semibold">
                                 ${q.options.map((opt, oIdx) => `
-                                    <div class="px-2 py-1 rounded ${oIdx === q.correct ? 'bg-green-900/50 text-green-400 border border-green-800' : 'bg-gray-700 text-gray-300'}">
-                                        ${String.fromCharCode(65 + oIdx)}. ${opt}
+                                    <div class="px-3 py-2 rounded-xl flex items-center gap-2 ${oIdx === q.correct ? 'bg-[#e6fff7] text-[#00A676] border-2 border-[#00E5A3]' : 'bg-gray-100 text-gray-600 border-2 border-transparent'}">
+                                        <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs text-white ${oIdx === q.correct ? 'bg-[#00E5A3]' : 'bg-gray-400'}">${String.fromCharCode(65 + oIdx)}</div>
+                                        ${opt}
                                     </div>
                                 `).join('')}
                             </div>
@@ -660,27 +759,25 @@
 
                 const container = document.getElementById('host-tab-players');
                 if (players.length === 0) {
-                    container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Chưa có sinh viên nào tham gia.</div>`;
+                    container.innerHTML = `<div class="col-span-full text-center text-white/50 font-bold py-10 text-lg border-2 border-dashed border-white/20 rounded-2xl">Chưa có sinh viên nào tham gia.</div>`;
                     return;
                 }
 
-                container.innerHTML = players.map(p => `
-                    <div class="bg-gray-800 rounded-lg p-3 flex flex-col items-center justify-center border border-gray-700 animate-fade-in">
-                        <div class="text-4xl mb-2">${p.avatar}</div>
-                        <div class="text-sm font-semibold text-center truncate w-full" title="${p.name}">${p.name}</div>
+                container.innerHTML = players.map((p, idx) => `
+                    <div class="lobby-card bg-white rounded-2xl p-4 flex flex-col items-center justify-center border-4 border-gray-100 shadow-lg text-gray-800" style="animation-delay: ${Math.min(idx * 0.05, 0.5)}s">
+                        <div class="text-5xl mb-2">${p.avatar}</div>
+                        <div class="text-sm font-black text-center truncate w-full uppercase">${p.name}</div>
                     </div>
                 `).join('');
             },
 
             hostStartGame() {
-                // Signal start to all students
                 localStorage.setItem(StorageKeys.STATE, 'playing');
-                // The Host doesn't need to play, but we can let them watch the leaderboard or state.
-                // For this demo, let's just make the Host dashboard disabled/show 'Game in progress'
-                document.getElementById('host-start-btn').innerText = "TRÒ CHƠI ĐANG DIỄN RA...";
-                document.getElementById('host-start-btn').setAttribute('disabled', 'true');
-                document.getElementById('host-start-btn').classList.remove('neon-btn-green', 'solid');
-                document.getElementById('host-start-btn').classList.add('bg-gray-800', 'text-gray-500', 'border-gray-700');
+                const btn = document.getElementById('host-start-btn');
+                btn.innerText = "TRÒ CHƠI ĐANG DIỄN RA...";
+                btn.setAttribute('disabled', 'true');
+                btn.classList.remove('btn-teal');
+                btn.classList.add('btn-purple');
             },
 
 
@@ -706,7 +803,6 @@
             },
 
             handlePinInput(e, idx) {
-                // Numeric only
                 e.target.value = e.target.value.replace(/[^0-9]/g, '');
                 if (e.target.value && idx < 5) {
                     const next = document.querySelectorAll('.pin-input')[idx + 1];
@@ -737,7 +833,6 @@
                 const hostPin = (localStorage.getItem(StorageKeys.PIN) || '').toString().trim();
 
                 if (enteredPin.trim() === hostPin && enteredPin.length === 6) {
-                    // Success
                     const player = {
                         id: 'STU_' + Date.now(),
                         name: name,
@@ -746,7 +841,6 @@
                     };
                     AppState.currentUser = player;
 
-                    // Add to storage
                     const players = this.getPlayers();
                     players.push(player);
                     localStorage.setItem(StorageKeys.PLAYERS, JSON.stringify(players));
@@ -754,9 +848,13 @@
                     this.closeModals();
                     this.setupStudentLobby();
                     this.navigate('student-lobby');
+                    
+                    // Try play audio if not playing
+                    if(AppState.audioEnabled) {
+                        document.getElementById('lobby-audio').play().catch(e=>{});
+                    }
                 } else {
                     document.getElementById('join-error').classList.remove('hidden-view');
-                    // Clear inputs
                     inputs.forEach(i => i.value = '');
                     inputs[0].focus();
                 }
@@ -772,20 +870,42 @@
                 if (!AppState.currentUser || AppState.currentUser === 'host') return;
                 const players = this.getPlayers();
                 document.getElementById('lobby-player-count').innerText = players.length;
+                
+                const container = document.getElementById('lobby-players-grid');
+                const otherPlayers = players.filter(p => p.id !== AppState.currentUser.id);
+                
+                if (otherPlayers.length === 0) {
+                    container.innerHTML = `<div class="col-span-full text-center text-white/50 font-bold py-4">Chưa có bạn nào khác.</div>`;
+                    return;
+                }
+
+                container.innerHTML = otherPlayers.map((p, idx) => `
+                    <div class="lobby-card bg-white/10 rounded-2xl p-3 flex flex-col items-center justify-center border border-white/20" style="animation-delay: ${Math.min(idx * 0.1, 1)}s">
+                        <div class="text-4xl mb-1">${p.avatar}</div>
+                        <div class="text-xs font-bold text-center truncate w-full uppercase text-white">${p.name}</div>
+                    </div>
+                `).join('');
             },
 
 
             // --- GAME ENGINE (STUDENT SIDE) ---
             startCountdown() {
+                // Stop lobby music
+                document.getElementById('lobby-audio').pause();
+                
                 this.navigate('game-countdown');
                 let count = 3;
                 const el = document.getElementById('game-countdown-number');
                 el.innerText = count;
+                el.className = "text-[200px] font-black text-[var(--quiz-yellow)] drop-shadow-[0_10px_0_#CC9900] animate-bounce";
                 
                 const intv = setInterval(() => {
                     count--;
                     if (count > 0) {
                         el.innerText = count;
+                        // Change color per tick
+                        if(count===2) el.className = "text-[200px] font-black text-[var(--quiz-teal)] drop-shadow-[0_10px_0_#00A676] animate-bounce";
+                        if(count===1) el.className = "text-[200px] font-black text-[var(--quiz-pink)] drop-shadow-[0_10px_0_#CC0055] animate-bounce";
                     } else {
                         clearInterval(intv);
                         this.startGameFlow();
@@ -808,31 +928,29 @@
                 this.navigate('game');
                 const q = QUESTIONS[AppState.currentQIndex];
                 
-                // Update Header
                 document.getElementById('game-q-current').innerText = AppState.currentQIndex + 1;
                 document.getElementById('game-q-total').innerText = QUESTIONS.length;
                 document.getElementById('game-player-avatar').innerText = AppState.currentUser.avatar;
+                document.getElementById('game-player-name').innerText = AppState.currentUser.name;
                 document.getElementById('game-player-score').innerText = AppState.currentUser.score;
 
-                // Update Question content
                 document.getElementById('game-question-text').innerText = q.q;
                 
-                // Render Answers
                 const grid = document.getElementById('game-answers-grid');
                 grid.innerHTML = q.options.map((opt, idx) => `
-                    <button class="answer-btn p-4 text-xl font-semibold flex items-center justify-center relative overflow-hidden" onclick="app.selectAnswer(${idx})" id="ans-btn-${idx}">
-                        <span class="absolute left-4 opacity-50 font-black text-2xl">${String.fromCharCode(65 + idx)}</span>
-                        ${opt}
+                    <button class="answer-btn ans-${idx} btn-3d" onclick="app.selectAnswer(${idx})" id="ans-btn-${idx}">
+                        <div class="absolute left-4 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-full bg-black/20 flex items-center justify-center font-black">
+                            ${String.fromCharCode(65 + idx)}
+                        </div>
+                        <span class="pl-8 text-center w-full block">${opt}</span>
                     </button>
                 `).join('');
 
-                // Hide feedback
                 const fb = document.getElementById('game-feedback');
                 fb.classList.add('hidden-view');
                 fb.classList.remove('opacity-100');
                 fb.classList.add('opacity-0');
 
-                // Start Timer 15s
                 AppState.timerValue = 15;
                 this.updateTimerUI();
                 
@@ -848,25 +966,27 @@
             },
 
             updateTimerUI() {
-                const el = document.getElementById('game-timer');
-                el.innerText = AppState.timerValue;
+                document.getElementById('game-timer-text').innerText = AppState.timerValue;
+                const bar = document.getElementById('game-timer-bar');
+                const pct = (AppState.timerValue / 15) * 100;
+                bar.style.width = `${pct}%`;
                 
                 if (AppState.timerValue <= 5) {
-                    el.classList.add('warning');
-                    el.classList.remove('active');
+                    bar.classList.add('warning');
                 } else {
-                    el.classList.remove('warning');
-                    el.classList.add('active');
+                    bar.classList.remove('warning');
                 }
             },
 
             selectAnswer(idx) {
-                if (AppState.selectedAnswerIndex !== -1) return; // Already answered
-                
+                if (AppState.selectedAnswerIndex !== -1) return;
                 clearInterval(AppState.gameInterval);
-                AppState.selectedAnswerIndex = idx;
                 
-                // Disable all buttons
+                // Freeze timer bar
+                const bar = document.getElementById('game-timer-bar');
+                bar.style.transition = 'none';
+                
+                AppState.selectedAnswerIndex = idx;
                 document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
                 
                 this.gradeAnswer();
@@ -882,26 +1002,23 @@
                 const q = QUESTIONS[AppState.currentQIndex];
                 const isCorrect = !isTimeout && AppState.selectedAnswerIndex === q.correct;
                 
-                // Calculate points (based on time remaining if correct)
                 let pointsEarned = 0;
                 if (isCorrect) {
-                    // Base 500 + time bonus up to 500
                     pointsEarned = 500 + Math.floor((AppState.timerValue / 15) * 500);
                     AppState.currentUser.score += pointsEarned;
                     this.updateScoreInStorage();
+                    this.triggerConfetti();
                 }
 
-                // Highlight buttons
                 const btns = document.querySelectorAll('.answer-btn');
                 btns.forEach((btn, idx) => {
                     if (idx === q.correct) {
-                        btn.classList.add('correct');
+                        btn.classList.add('correct-show');
                     } else if (idx === AppState.selectedAnswerIndex && !isCorrect) {
-                        btn.classList.add('wrong');
+                        btn.classList.add('wrong-show');
                     }
                 });
 
-                // Show Feedback overlay (2 seconds)
                 const fb = document.getElementById('game-feedback');
                 const fbContent = document.getElementById('game-feedback-content');
                 const fbIcon = document.getElementById('game-feedback-icon');
@@ -909,7 +1026,6 @@
                 const fbPts = document.getElementById('game-feedback-points');
 
                 fb.classList.remove('hidden-view');
-                // trigger reflow
                 void fb.offsetWidth;
                 fb.classList.remove('opacity-0');
                 fb.classList.add('opacity-100');
@@ -919,24 +1035,23 @@
                 if (isTimeout) {
                     fbIcon.innerText = '⏰';
                     fbText.innerText = 'Hết thời gian!';
-                    fbText.className = 'text-4xl font-bold text-gray-400';
+                    fbText.className = 'text-4xl md:text-5xl font-black mb-2 uppercase text-gray-500';
                     fbPts.innerText = '+0';
-                    fbPts.className = 'text-2xl mt-2 text-gray-400';
+                    fbPts.className = 'text-3xl font-bold bg-gray-100 text-gray-500 inline-block px-6 py-2 rounded-full mt-2';
                 } else if (isCorrect) {
-                    fbIcon.innerText = '✅';
+                    fbIcon.innerText = '🎉';
                     fbText.innerText = 'Chính xác!';
-                    fbText.className = 'text-4xl font-bold text-green-400';
+                    fbText.className = 'text-4xl md:text-5xl font-black mb-2 uppercase text-[var(--quiz-green)]';
                     fbPts.innerText = `+${pointsEarned}`;
-                    fbPts.className = 'text-2xl mt-2 text-green-400';
+                    fbPts.className = 'text-3xl font-bold bg-[#e6fff7] text-[var(--quiz-green)] inline-block px-6 py-2 rounded-full mt-2 border-2 border-[var(--quiz-green)]';
                 } else {
                     fbIcon.innerText = '❌';
                     fbText.innerText = 'Sai rồi!';
-                    fbText.className = 'text-4xl font-bold text-red-500';
+                    fbText.className = 'text-4xl md:text-5xl font-black mb-2 uppercase text-[var(--quiz-red)]';
                     fbPts.innerText = '+0';
-                    fbPts.className = 'text-2xl mt-2 text-red-500';
+                    fbPts.className = 'text-3xl font-bold bg-red-50 text-[var(--quiz-red)] inline-block px-6 py-2 rounded-full mt-2';
                 }
 
-                // Wait 2s then go to leaderboard
                 setTimeout(() => {
                     this.showLeaderboard(false);
                 }, 2000);
@@ -944,30 +1059,35 @@
 
             showLeaderboard(isFinal = false) {
                 this.navigate('leaderboard');
-                const players = this.getPlayers().sort((a, b) => b.score - a.score).slice(0, 5); // Top 5
+                const players = this.getPlayers().sort((a, b) => b.score - a.score).slice(0, 5);
                 
                 const list = document.getElementById('lb-list');
                 if (players.length === 0) {
-                    list.innerHTML = `<div class="text-center text-gray-500">Chưa có dữ liệu</div>`;
+                    list.innerHTML = `<div class="text-center text-gray-500 font-bold py-10">Chưa có dữ liệu</div>`;
                 } else {
                     list.innerHTML = players.map((p, idx) => {
-                        let rankClass = '';
+                        let rankStyle = '';
                         let medal = '';
-                        if (idx === 0) { rankClass = 'lb-rank-1'; medal = '🥇'; }
-                        else if (idx === 1) { rankClass = 'lb-rank-2'; medal = '🥈'; }
-                        else if (idx === 2) { rankClass = 'lb-rank-3'; medal = '🥉'; }
-                        else { medal = `${idx + 1}.`; }
+                        if (idx === 0) { rankStyle = 'bg-[#FFD000] text-black shadow-[0_4px_0_0_#CC9900]'; medal = '👑'; }
+                        else if (idx === 1) { rankStyle = 'bg-gray-300 text-black shadow-[0_4px_0_0_#A0A0A0]'; medal = '🥈'; }
+                        else if (idx === 2) { rankStyle = 'bg-[#cd7f32] text-white shadow-[0_4px_0_0_#8A5A21]'; medal = '🥉'; }
+                        else { rankStyle = 'bg-gray-100 text-gray-600'; medal = `${idx + 1}`; }
 
                         const isMe = AppState.currentUser && p.id === AppState.currentUser.id;
+                        
+                        if (isFinal && isMe && idx === 0) {
+                            this.triggerConfetti();
+                        }
 
                         return `
-                            <div class="flex items-center justify-between bg-gray-800 p-4 rounded-lg border ${isMe ? 'border-green-400 bg-green-900/20' : 'border-gray-700'}">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-8 text-center font-bold text-xl ${rankClass}">${medal}</div>
-                                    <div class="text-3xl">${p.avatar}</div>
-                                    <div class="font-semibold text-lg ${isMe ? 'text-green-400' : ''}">${p.name} ${isMe ? '(Bạn)' : ''}</div>
+                            <div class="flex items-center justify-between p-3 sm:p-4 rounded-2xl border-2 ${isMe ? 'border-[var(--quiz-teal)] bg-[#e6fff7]' : 'border-gray-100 bg-white'} shadow-sm relative overflow-hidden transition-transform hover:scale-[1.02]">
+                                ${isMe ? '<div class="absolute top-0 left-0 w-1 h-full bg-[var(--quiz-teal)]"></div>' : ''}
+                                <div class="flex items-center gap-3 sm:gap-5">
+                                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-black text-xl sm:text-2xl ${rankStyle}">${medal}</div>
+                                    <div class="text-4xl sm:text-5xl">${p.avatar}</div>
+                                    <div class="font-black text-lg sm:text-2xl text-gray-800 uppercase">${p.name} ${isMe ? '<span class="text-[var(--quiz-teal)] text-sm ml-2">(Bạn)</span>' : ''}</div>
                                 </div>
-                                <div class="font-bold text-xl ${rankClass}">${p.score}</div>
+                                <div class="font-black text-2xl sm:text-3xl text-[var(--quiz-purple-dark)] bg-gray-100 px-4 py-2 rounded-xl border-2 border-gray-200">${p.score}</div>
                             </div>
                         `;
                     }).join('');
@@ -978,7 +1098,6 @@
                     document.getElementById('lb-next-info').classList.remove('hidden-view');
                     document.getElementById('lb-final-info').classList.add('hidden-view');
                     
-                    // Countdown 3s to next question
                     let lbTimer = 3;
                     const timerEl = document.getElementById('lb-timer');
                     timerEl.innerText = lbTimer;
@@ -998,6 +1117,7 @@
                     document.getElementById('lb-subtitle').innerText = "KẾT QUẢ CHUNG CUỘC";
                     document.getElementById('lb-next-info').classList.add('hidden-view');
                     document.getElementById('lb-final-info').classList.remove('hidden-view');
+                    this.triggerConfetti();
                 }
             },
 
@@ -1033,7 +1153,6 @@
             },
 
             handleStorageEvent(e) {
-                // 1. Sync Lobby UI if we are in Lobby or Host Dashboard
                 if (e.key === StorageKeys.PLAYERS) {
                     if (AppState.currentView === 'host-dashboard') {
                         this.updateHostLobbyUI();
@@ -1042,7 +1161,6 @@
                     }
                 }
 
-                // 2. Start game trigger (Host -> Student)
                 if (e.key === StorageKeys.STATE && e.newValue === 'playing') {
                     if (AppState.currentUser && AppState.currentUser !== 'host' && AppState.currentView === 'student-lobby') {
                         this.startCountdown();
@@ -1051,7 +1169,6 @@
             }
         };
 
-        // Init
         document.addEventListener('DOMContentLoaded', () => {
             app.init();
         });
